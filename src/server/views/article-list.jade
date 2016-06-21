@@ -2,13 +2,13 @@ div
 	h2(class='article__crosshead-alt')
 		| Top Stories
 	div(class='stories__container o-grid-row')
-	each item in items
-		div(class='stories_story' data-o-grid-colspan="12 M4")
-			div(class='stories__story--container')
-				a(href='http://www.ft.com/cms/s/'+item.id+'.html')
-					div(class='stories__story--headline')
-						= item.title
-					div(class='stories__story--image')
-						img(class='stories__story--image' src='https://image.webservices.ft.com/v1/images/raw/'+item.mainImage.url+'?source=ig&width=167' alt="")
-				div(class='stories__story--blurb')
-					= item.subheading
+		each item in items
+			div(class='stories__story' data-o-grid-colspan="12 M4")
+				div(class='stories__story--container')
+					a(href='http://www.ft.com/cms/s/'+item.id+'.html')
+						div(class='stories__story--headline')
+							= item.title
+						div(class='stories__story--image')
+							img(class='stories__story--image' src='https://image.webservices.ft.com/v1/images/raw/'+item.mainImage.url+'?source=ig&width=167' alt="")
+					div(class='stories__story--blurb')
+						= item.subheading
