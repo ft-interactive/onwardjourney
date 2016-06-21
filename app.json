@@ -1,0 +1,29 @@
+{
+  "env": {
+    "NODE_ENV": "production",
+    "apiKey": {
+      "description": "API Key for CAPIv1",
+      "generator": "secret"
+    },
+    "api2Key": {
+      "description": "API Key for CAPIv2",
+      "generator": "secret"
+    },
+    "API_KEY": {
+      "description": "API Key for FT API",
+      "generator": "secret"
+    },
+    "ES_INTERFACE_API_KEY": {
+      "description": "API Key for ElasticSearch",
+      "generator": "secret"
+    },
+    "ES_AWS_ACCESS_KEY": {
+      "description": "Access Key for ElasticSearch",
+      "generator": "secret"
+    },
+    "ES_AWS_SECRET_ACCESS_KEY": {
+      "description": "Secret access Key for ElasticSearch",
+      "generator": "secret"
+    }
+  }
+}

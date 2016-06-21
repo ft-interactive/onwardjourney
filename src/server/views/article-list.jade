@@ -1,0 +1,7 @@
+ul
+	each item in items
+		li
+			a(class='article-link' href='https://next.ft.com/'+item.id)
+				h3= item.title
+			span(class='article-subheading')
+				= item.subheading
