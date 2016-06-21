@@ -8,6 +8,9 @@ export default (item, defaultSize, className) => {
 		if (className) {
 			item.mainImage.className = className;
 		}
+		if (item.mainImage.url) {
+			item.mainImage.url = encodeURIComponent(item.mainImage.url);
+		}
 		return item.mainImage;
 	}
 };
