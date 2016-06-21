@@ -1,11 +1,11 @@
 {
   "env": {
     "NODE_ENV": "production",
-    "apiKey": {
+    "apikey": {
       "description": "API Key for CAPIv1",
       "generator": "secret"
     },
-    "api2Key": {
+    "api2key": {
       "description": "API Key for CAPIv2",
       "generator": "secret"
     },
