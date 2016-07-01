@@ -1,7 +1,8 @@
 /* global fetch */
 import 'dotenv/config';
 import 'isomorphic-fetch';
-import getArticleListData from './getArticleListData';
+import getArticlesFromList from './getArticlesFromList';
+import getArticlesFromThing from './getArticlesFromThing';
 import jade from 'jade';
 import Koa from 'koa';
 import koaLogger from 'koa-logger';
@@ -29,15 +30,26 @@ const router = new Router();
 // precompile template functions
 const views = path.resolve(__dirname, 'views');
 
-const renderArticleList = jade.compileFile(path.join(views, 'article-list.jade'));
+const renderArticles = jade.compileFile(path.join(views, 'articles.jade'));
 
 // define routes
 router
 	// a route to get the bertha data (post-transformations)
 	.get('/list/:uuid', async ctx => {
 		ctx.set('Content-Type', 'text/html');
-		const templateData = await getArticleListData(ctx.params.uuid);
-		ctx.body = renderArticleList(templateData);
+		ctx.body = renderArticles(await getArticlesFromList(ctx.params.uuid));
+	})
+	.get('/list/:uuid/limit/:limit', async ctx => {
+		ctx.set('Content-Type', 'text/html');
+		ctx.body = renderArticles(await getArticlesFromList(ctx.params.uuid, ctx.params.limit));
+	})
+	.get('/thing/:uuid', async ctx => {
+		ctx.set('Content-Type', 'text/html');
+		ctx.body = renderArticles(await getArticlesFromThing(ctx.params.uuid));
+	})
+	.get('/thing/:uuid/limit/:limit', async ctx => {
+		ctx.set('Content-Type', 'text/html');
+		ctx.body = renderArticles(await getArticlesFromThing(ctx.params.uuid, ctx.params.limit));
 	})
 ;
 

@@ -8,7 +8,8 @@ div
 					a(href='http://www.ft.com/cms/s/'+item.id+'.html')
 						div(class='stories__story--headline')
 							= item.title
-						div(class='stories__story--image')
-							img(class='stories__story--image' src='https://image.webservices.ft.com/v1/images/raw/'+item.mainImage.url+'?source=ig&width=390' alt="")
+						if item.mainImage
+							div(class='stories__story--image')
+								img(class='stories__story--image' src='https://image.webservices.ft.com/v1/images/raw/'+item.mainImage.url+'?source=ig&width=390' alt="")
 					div(class='stories__story--blurb')
 						= item.subheading
