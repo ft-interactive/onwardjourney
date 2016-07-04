@@ -6,7 +6,7 @@ import {coroutine} from 'bluebird';
  * Downloads a list of articles from CAPI and returns the UUIDs, plus any metadata.
  */
 
-export default coroutine(function * loadList(id) {
+export default coroutine(function * loadThing(id) {
 	let apiResult;
 
 	try {
