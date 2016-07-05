@@ -6,32 +6,14 @@ import loadList from './lib/load-list';
 import loadThing from './lib/load-thing';
 import subheading from './models/subheading';
 
-export default async (reqType, uuid, limit = null) => {
-
-	if (uuid.endsWith('.json')) {
-		uuid = uuid.substring(0, uuid.length-5);
-	} else if (limit && limit.endsWith('.json')) {
-		limit = limit.substring(0, limit.length-5) * 1;
-	}
+export default async (reqType, uuid) => {
 
 	let getItems;
 
 	if (reqType === 'list') {
-		getItems = loadList(uuid)
-					.then(items => {
-						if (limit) {
-							items.uuids = items.uuids.slice(0, limit);
-						}
-						return api.content({ uuid: items.uuids, index: 'v3_api_v2' })
-					});
+		getItems = loadList(uuid).then(items => api.content({ uuid: items.uuids, index: 'v3_api_v2' }));
 	} else if (reqType === 'thing') {
-		getItems = loadThing(uuid)
-					.then(items => {
-						if (limit) {
-							items = items.slice(0, limit);
-						}
-						return items;
-					});
+		getItems = loadThing(uuid);
 	}
 
 	return getItems.then(items => ({
