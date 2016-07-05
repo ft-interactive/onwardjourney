@@ -41,6 +41,11 @@ router
 		ctx.list = await getItems('thing', ctx.params.uuid);
 		await next();
 	})
+	//default to 'news' topic
+	.get('/', async (ctx, next) => {
+		ctx.list = await getItems('thing', 'Nw==-R2VucmVz');
+		await next();
+	})
 ;
 
 // log in development
