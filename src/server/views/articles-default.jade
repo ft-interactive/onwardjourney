@@ -1,15 +1,14 @@
 div(data-trackable='onwardjourney')
 	h2(class='article__crosshead-alt')
 		| More coverage
-	div(class='stories__container o-grid-row')
+	div(class='o-grid-row')
 		each item in items
-			div(class='stories__story' data-o-grid-colspan="12 S6 M4")
-				div(class='stories__story--container')
+			div(class='o-card' data-o-grid-colspan='12 S6 M4')
+				if item.mainImage
+					div(class='o-card__image o-card__image--top')
+						img(src='https://image.webservices.ft.com/v1/images/raw/'+item.mainImage.url+'?source=ig&width=390' alt='')
+				h2(class='o-card__heading')
 					a(href='http://www.ft.com/cms/s/'+item.id+'.html' data-trackable='main-link')
-						div(class='stories__story--headline')
-							= item.title
-						if item.mainImage
-							div(class='stories__story--image')
-								img(class='stories__story--image' src='https://image.webservices.ft.com/v1/images/raw/'+item.mainImage.url+'?source=ig&width=390' alt="")
-					div(class='stories__story--blurb')
-						= item.subheading
+						= item.title
+				p(class='o-card__standfirst')
+					= item.subheading
