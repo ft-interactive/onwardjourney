@@ -1,7 +1,7 @@
 /* global fetch */
 import 'dotenv/config';
 import 'isomorphic-fetch';
-import getArticleListData from './getArticleListData';
+import getItems from './getItems';
 import jade from 'jade';
 import Koa from 'koa';
 import koaLogger from 'koa-logger';
@@ -29,15 +29,23 @@ const router = new Router();
 // precompile template functions
 const views = path.resolve(__dirname, 'views');
 
-const renderArticleList = jade.compileFile(path.join(views, 'article-list.jade'));
+const renderDefaultLayout = jade.compileFile(path.join(views, 'articles-default.jade'));
 
 // define routes
 router
-	// a route to get the bertha data (post-transformations)
-	.get('/list/:uuid', async ctx => {
-		ctx.set('Content-Type', 'text/html');
-		const templateData = await getArticleListData(ctx.params.uuid);
-		ctx.body = renderArticleList(templateData);
+	.get('/list/:uuid', async (ctx, next) => {
+		ctx.list = await getItems('list', ctx.params.uuid);
+		await next();
+	})
+	.get('/thing/:uuid', async (ctx, next) => {
+		ctx.list = await getItems('thing', ctx.params.uuid);
+		await next();
+	})
+	.get('/favicon.ico', async ctx => { return; })
+	//default to 'news' topic
+	.get('/', async (ctx, next) => {
+		ctx.list = await getItems('thing', 'Nw==-R2VucmVz');
+		await next();
 	})
 ;
 
@@ -49,6 +57,41 @@ if (process.env.ENVIRONMENT === 'development') {
 // start it up
 app
 	.use(router.routes())
+	.use(async (ctx, next) => {
+		// limit items
+		if (ctx.query.limit && /^[0-9]+$/.test(ctx.query.limit)) {
+			ctx.list.items = ctx.list.items.slice(0, ctx.query.limit);
+		}
+
+		await next();
+	})
+	.use(async (ctx, next) => {
+		//set content type
+		ctx.query.type = ctx.query.type || 'html';
+
+		if (ctx.query.type === 'html') {
+			ctx.set('Content-Type', 'text/html');
+		} else if (ctx.query.type === 'json') {
+			ctx.set('Content-Type', 'application/json');
+			ctx.output = JSON.stringify(ctx.list);
+		}
+
+		await next();
+	})
+	.use(async (ctx, next) => {
+		// set html layout
+		if (ctx.query.type === 'html') {
+
+			ctx.query.layout = ctx.query.layout || 'default';
+
+			if (ctx.query.layout === 'default') {
+				ctx.output = renderDefaultLayout(ctx.list);
+			}
+		}
+
+		await next();
+	})
+	.use(async ctx => { ctx.body = ctx.output; })
 	.use(router.allowedMethods())
 	.use(koaStatic(path.resolve(__dirname, '..', 'client')))
 	.listen(PORT, () => {

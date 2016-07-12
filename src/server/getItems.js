@@ -3,16 +3,23 @@ import extractImage from './lib/extract-image';
 import getBranding from 'ft-n-article-branding';
 import legacyTagCompat from './models/legacy-tag-compat';
 import loadList from './lib/load-list';
+import loadThing from './lib/load-thing';
 import subheading from './models/subheading';
 
-export default async uuid => {
+export default async (reqType, uuid) => {
 
-	return loadList(uuid)
-			.then(list => api.content({ uuid: list.uuids, index: 'v3_api_v2' }))
-			.then(items => ({
-				items: items.filter(item => item).map(item => articleModel(item)),
-				id: 'list-fragment_' + uuid,
-			}));
+	let getItems;
+
+	if (reqType === 'list') {
+		getItems = loadList(uuid).then(items => api.content({ uuid: items.uuids, index: 'v3_api_v2' }));
+	} else if (reqType === 'thing') {
+		getItems = loadThing(uuid);
+	}
+
+	return getItems.then(items => ({
+		items: items.filter(item => item).map(item => articleModel(item)),
+		id: 'list-fragment_' + uuid,
+	}));
 }
 
 const articleModel = item => {
@@ -23,5 +30,5 @@ const articleModel = item => {
 		subheading: subheading(item),
 		mainImage: extractImage(item),
 		branding: legacyTagCompat(getBranding(item.metadata)),
-	};
-};
+	}
+}
