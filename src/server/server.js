@@ -4,6 +4,7 @@ import 'isomorphic-fetch';
 import getItems from './getItems';
 import pug from 'pug';
 import Koa from 'koa';
+import koaCors from 'koa-cors';
 import koaLogger from 'koa-logger';
 import koaStatic from 'koa-static';
 import path from 'path';
@@ -56,6 +57,7 @@ if (process.env.ENVIRONMENT === 'development') {
 
 // start it up
 app
+	.use(koaCors())
 	.use(router.routes())
 	.use(async (ctx, next) => {
 		// limit items
