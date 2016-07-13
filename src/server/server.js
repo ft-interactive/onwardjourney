@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import 'isomorphic-fetch';
 import getItems from './getItems';
-import jade from 'jade';
+import pug from 'pug';
 import Koa from 'koa';
 import koaLogger from 'koa-logger';
 import koaStatic from 'koa-static';
@@ -29,7 +29,7 @@ const router = new Router();
 // precompile template functions
 const views = path.resolve(__dirname, 'views');
 
-const renderDefaultLayout = jade.compileFile(path.join(views, 'articles-default.jade'));
+const renderDefaultLayout = pug.compileFile(path.join(views, 'articles-default.pug'));
 
 // define routes
 router
