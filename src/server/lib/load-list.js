@@ -10,7 +10,7 @@ export default coroutine(function * loadList(id) {
 	let apiResult;
 
 	try {
-		apiResult = yield api.lists({uuid: id});
+		apiResult = yield api.lists({uuid: id, retry: 6});
 	}
 	catch (err) {
 		// workaround api client rejecting with a stackless error
