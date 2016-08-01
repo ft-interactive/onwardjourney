@@ -2,6 +2,7 @@
   "name": "onwardjourney",
   "version": "1.0.0",
   "description": "Retrieve a list of articles and outputs a fragment of HTML",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "build": "trip build",
