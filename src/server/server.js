@@ -11,6 +11,7 @@ import path from 'path';
 import Router from 'koa-router';
 
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = ['http://127.0.0.1', 'https://127.0.0.1', 'http://localhost', 'https://localhost', 'http://localhost:3000', 'https://localhost:3000', 'http://ft.com', 'https://ft.com', 'http://www.ft.com', 'https://www.ft.com', 'http://next.ft.com', 'https://next.ft.com', 'http://ig.ft.com', 'https://ig.ft.com'];
 
 process.on('uncaughtException', error => {
 	console.log('Global uncaughtException!', error.stack);
@@ -57,6 +58,14 @@ if (process.env.ENVIRONMENT === 'development') {
 
 // start it up
 app
+	.use(function(req, res, next) {
+
+		const origin = req.headers.origin;
+
+		if(allowedOrigins.indexOf(origin) > -1){
+			next({origin});
+		}
+	})
 	.use(koaCors())
 	.use(router.routes())
 	.use(async (ctx, next) => {
