@@ -53,7 +53,7 @@ mixin timestamp(date)
 mixin brandingtag(branding, showheadshot)
   if branding.headshot && showheadshot
     img.o-card__meta-image.o-card__meta-image--rounded(src=`${branding.headshot}?width=120&source=IG`)
-  a.o-card__tag(href=`https://next.ft.com${branding.url}`)=branding.name
+  a.o-card__tag(href=branding.url)=branding.name
 
 mixin tag(url, label)
   a.o-card__tag(href=url)=label
