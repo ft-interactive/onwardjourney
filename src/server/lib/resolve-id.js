@@ -5,6 +5,7 @@ const vanities = {
 
 	list: {
 		graphics: '2f94fa02-647f-11e6-8e73-a628b7ca0fc8',
+		highlights: '73667f46-1a55-11e5-a130-2e7db721f996',
 	},
 };
 
