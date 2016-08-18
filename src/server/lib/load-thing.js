@@ -18,14 +18,20 @@ export default function loadThing(id) {
 
 		api.things({ identifierValues: [id] }),
 
-	]).then(([searchResults, tags]) => list({
-		id,
-		type: tags.items[0].taxonomy,
-		items: searchResults,
-		title: tags.items[0].name,
-		canFollow: true,
-		url: 'https://next.ft.com/stream/' + tags.items[0].taxonomy + 'Id/' + id,
-	})).catch(err => {
+	]).then(([searchResults, tags]) => {
+		if (!tags.items || !tags.items.length) {
+			throw new Error('Not Found');
+		}
+
+		return list({
+			id,
+			type: tags.items[0].taxonomy,
+			items: searchResults,
+			title: tags.items[0].name,
+			canFollow: true,
+			url: 'https://next.ft.com/stream/' + tags.items[0].taxonomy + 'Id/' + id,
+		});
+	}).catch(err => {
 		// workaround api client rejecting with a stackless error
 		// - see https://github.com/matthew-andrews/fetchres/issues/9
 		if ((!err instanceof Error) || !err.stack) {

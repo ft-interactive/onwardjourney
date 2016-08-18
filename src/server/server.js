@@ -10,6 +10,7 @@ import path from 'path';
 import Router from 'koa-router';
 import list from './lib/load-list';
 import thing from './lib/load-thing';
+import resolveId from './lib/resolve-id';
 
 const PORT = process.env.PORT || 5000;
 const prod = process.env.NODE_ENV === 'production';
@@ -30,6 +31,7 @@ const app = new Koa();
 const router = new Router({
 	prefix: '/v1',
 });
+const rootRouter = new Router();
 
 (new Pug({
 	app,
@@ -37,23 +39,64 @@ const router = new Router({
 	helperPath: path.resolve(__dirname, 'helpers.js'),
 }));
 
-// define routes
+async function limit(ctx, next) {
+	if (Number.isInteger(Number.parseInt(ctx.query.limit, 10))) {
+		ctx.limit = Number.parseInt(ctx.query.limit, 10);
+	}
+
+	await next();
+
+	if (ctx.limit && ctx.list && ctx.list.items
+																	&& ctx.list.items.length > ctx.limit) {
+		ctx.list.items = ctx.list.items.slice(0, ctx.limit);
+	}
+}
+
+async function render(ctx, next) {
+	await next();
+	ctx.set('Cache-Control', 'public, maxage=1200');
+	if (ctx.params.format === 'html') {
+		if (ctx.list.items.length) {
+			ctx.render(ctx.params.layout || 'default', ctx.list);
+		}
+		else {
+			ctx.body = '';
+		}
+	}
+	else if (ctx.params.format === 'json') {
+		if (ctx.params.layout === 'ids') {
+			ctx.body = ctx.list.items.map(item => item.id);
+		}
+		else if (ctx.params.layout === 'simple') {
+			ctx.body = ctx.list.items.map(
+				item => ({ id: item.id, title: item.title, image: item.mainImage && item.mainImage.url })
+			);
+		}
+		else {
+			ctx.body = ctx.list;
+		}
+	}
+}
+
 router
-	.get('/list/:uuid', async (ctx, next) => {
-		ctx.list = await list(ctx.params.uuid);
-		await next();
-	})
-	.get('/thing/:uuid', async (ctx, next) => {
-		ctx.list = await thing(ctx.params.uuid);
-		await next();
-	})
-	.get('/favicon.ico', async ctx => { return; })
-	// default to 'news' topic
-	.get('/', async (ctx, next) => {
-		ctx.list = await thing('Nw==-R2VucmVz');
+	.use(render)
+	.use(limit)
+	.get('/:path(thing|list)/:name/:format/:layout?', async (ctx, next) => {
+		const fn = ctx.params.path === 'list' ? list : thing;
+		const id = resolveId(ctx.params.path, ctx.params.name);
+		ctx.list = await fn(id);
 		await next();
 	})
 ;
+
+rootRouter
+	.get('/favicon.ico', async ctx => {
+		ctx.redirect('https://ig.ft.com/favicon.ico');
+	})
+	.get('/__gtg', async ctx => {
+		ctx.set('Content-Type', 'no-cache');
+		ctx.body = 'OK';
+	});
 
 // dev logging
 if (!prod) {
@@ -66,36 +109,10 @@ app
 		methods: ['GET'],
 	}))
 	.use(router.routes())
-	.use(async (ctx, next) => {
-		// limit items
-		if (ctx.query.limit && /^[0-9]+$/.test(ctx.query.limit)) {
-			ctx.list.items = ctx.list.items.slice(0, ctx.query.limit);
-		}
-
-		await next();
-	})
-	.use(async (ctx, next) => {
-		ctx.query.type = ctx.query.type || 'html';
-		ctx.set('Cache-Control', 'public, maxage=1200');
-
-		if (ctx.query.type === 'html') {
-			if (ctx.list.items.length) {
-				ctx.render(ctx.query.layout || 'default', ctx.list);
-			}
-			else {
-				ctx.body = '';
-			}
-		}
-		else if (ctx.query.type === 'json') {
-			ctx.body = ctx.list;
-		}
-
-		await next();
-	})
 	.use(router.allowedMethods())
+	.use(rootRouter.routes())
 	.use(koaStatic(path.resolve(__dirname, '..', 'client')))
 	.listen(PORT, () => {
-		console.log(`
-		Running on port ${PORT} - http://localhost:${PORT}/`);
+		console.log(`Running on port ${PORT} - http://localhost:${PORT}/`);
 	})
 ;

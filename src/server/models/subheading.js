@@ -10,4 +10,5 @@ export default item => {
 	else if (item.bodyXML) {
 		return cheerio.load(item.bodyXML)('p').first().text();
 	}
+	return undefined;
 };
