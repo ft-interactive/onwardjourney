@@ -1,0 +1,9 @@
+include mixins
+
+.o-grid-container.onward-journey
+  .o-grid-row
+    +col("12 center")
+      block header
+        +panel_header(title, url, label)
+  .o-grid-row
+    block content

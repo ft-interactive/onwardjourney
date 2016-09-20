@@ -1,33 +1,27 @@
-# onwardjourney
-
-ft-ig-onwardjourney
-
-Assembles and outputs HTML for a list of articles, currently used on the [Brexit Polling page](https://ig.ft.com/sites/brexit-polling/).
-
-Warning: this serverside application has no caching, no efficiency – it builds every response from scratch, including loading content from remote URLs. It will break if put under heavy load. Must have a CDN or poller in front of it.
+# Onward Journey
 
 ## Routes
 
-- `/list/uuid` – where `uuid` is a list uuid. Outputs the HTML for all the articles within the specified list.
+- `/list/:id`
+- `/thing/:id`
+
+Both routes have the following query parameters:
+
+- `type={html|json}` Response format. Default is `html`.
+- `limit={number}` Integer limiting the number of articles in the list. Defaults to no limit.
+- `layout={layoutName}` Specify a template. Optional; a default layout is provided.
 
 ## Developing
 
-1. clone this repo
-1. add a `.env` file with those variables described in [app.json](./app.json) (you'll need to get the actual values off another dev)
-1. `npm install`
-1. `npm run develop`
-1. code away
+You need an `.env` file with the variables listed in [app.json](./app.json)
 
-Things should refresh in your browser automatically.
+Start a watch server:
 
-## Deploying
-
-1. Optional: make a PR into master, and Heroku will deploy you a live [review app](https://blog.heroku.com/archives/2015/9/3/heroku_flow_pipelines_review_apps_and_github_sync) so you can check it works OK in production. (Heroku will post a link automatically shortly after you create the PR.)
-2. When you merge a PR into master (or just commit directly to master) Heroku will deploy to the prod app.
-
-You can check deployment status on the Heroku dashboard.
+```
+npm run develop
+```
 
 ## Licence
-This software is published by the Financial Times under the [MIT licence](http://opensource.org/licenses/MIT). 
+This software is published by the Financial Times under the [MIT licence](http://opensource.org/licenses/MIT).
 
 Please note the MIT licence includes only the software, and does not cover any FT content made available using the software, which is copyright &copy; The Financial Times Limited, all rights reserved. For more information about re-publishing FT content, please contact our [syndication department](http://syndication.ft.com/).

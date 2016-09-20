@@ -1,11 +1,8 @@
-export default tag => {
-	if (tag) {
-		return {
-			taxonomy: tag.taxonomy,
-			headshot: tag.headshot,
-			name: tag.prefLabel,
-			url: '/stream/' + tag.taxonomy + 'Id/' + tag.idV1,
-			id: tag.idV1
-		};
-	}
-};
+const streamUrl = (id, taxonomy) =>
+	(id && taxonomy ? `https://next.ft.com/stream/${taxonomy}Id/${id}` : '');
+
+const createTag = ({ taxonomy, headshot, prefLabel, idV1 }) =>
+	({ id: idV1, taxonomy, headshot, name: prefLabel, url: streamUrl(idV1, taxonomy) });
+
+export default metadata =>
+	(metadata ? createTag(metadata) : undefined);
