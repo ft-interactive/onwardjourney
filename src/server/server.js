@@ -35,8 +35,6 @@ const app = new Koa();
 app.use(koaConditional());
 app.use(koaEtag());
 
-console.log(app);
-
 const router = new Router({
 	prefix: '/v1',
 });
