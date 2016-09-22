@@ -6,11 +6,14 @@ import Koa from 'koa';
 import koaCors from 'koa-cors';
 import koaLogger from 'koa-logger';
 import koaStatic from 'koa-static';
+import koaConditional from 'koa-conditional-get';
+import koaEtag from 'koa-etag';
 import path from 'path';
 import Router from 'koa-router';
 import list from './lib/load-list';
 import thing from './lib/load-thing';
 import resolveId from './lib/resolve-id';
+
 
 const PORT = process.env.PORT || 5000;
 const prod = process.env.NODE_ENV === 'production';
@@ -28,6 +31,12 @@ process.on('unhandledRejection', error => {
 });
 
 const app = new Koa();
+
+app.use(koaConditional());
+app.use(koaEtag());
+
+console.log(app);
+
 const router = new Router({
 	prefix: '/v1',
 });
