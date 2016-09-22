@@ -1,4 +1,8 @@
 {
+  "name": "IG Onward Journey",
+  "website": "https://ig.ft.com/onwardjourney/",
+  "success_url": "/v1/list/graphics/html?limit=4",
+  "repository": "https://github.com/ft-interactive/onwardjourney",
   "env": {
     "NODE_ENV": "production",
     "apikey": {
