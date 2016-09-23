@@ -1,4 +1,5 @@
 import 'isomorphic-fetch';
+import createError from 'http-errors';
 import api from 'next-ft-api-client';
 import list from '../models/list';
 
@@ -11,6 +12,11 @@ export default async function loadList(id) {
 		apiResult = await api.lists({ uuid: id, retry: 6 });
 	}
 	catch (err) {
+
+		if (err.name === 'BadServerResponseError') {
+			throw new createError.NotFound();
+		}
+
 		// workaround api client rejecting with a stackless error
 		// - see https://github.com/matthew-andrews/fetchres/issues/9
 		if ((!err instanceof Error) || !err.stack) {

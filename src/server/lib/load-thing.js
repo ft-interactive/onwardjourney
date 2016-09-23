@@ -1,4 +1,5 @@
 import 'isomorphic-fetch';
+import createError from 'http-errors';
 import api from 'next-ft-api-client';
 import list from '../models/list';
 
@@ -20,7 +21,7 @@ export default function loadThing(id) {
 
 	]).then(([searchResults, tags]) => {
 		if (!tags.items || !tags.items.length) {
-			throw new Error('Not Found');
+			throw new createError.NotFound();
 		}
 
 		return list({
@@ -35,6 +36,11 @@ export default function loadThing(id) {
 		// workaround api client rejecting with a stackless error
 		// - see https://github.com/matthew-andrews/fetchres/issues/9
 		if ((!err instanceof Error) || !err.stack) {
+
+			if (err.name === 'BadServerResponseError') {
+				throw new createError.NotFound();
+			}
+
 			const nonError = new Error(`
 				Non-error thrown -
 					name: "${err.name}";

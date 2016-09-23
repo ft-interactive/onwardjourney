@@ -51,6 +51,7 @@
     "exhibit-plugin-sass": "^0.1.3",
     "ft-n-article-branding": "^3.0.6",
     "ft-next-article-primary-tag": "^2.0.0",
+    "http-errors": "^1.5.0",
     "isomorphic-fetch": "^2.2.1",
     "koa": "^2.0.0",
     "koa-conditional-get": "^2.0.0",
