@@ -114,7 +114,21 @@ if (!prod) {
 app
 	.use(koaCors({
 		methods: ['GET'],
+		origin: !prod ? true : req => {
+			if (/\.ft\.com(:\d+)?$/.test(req.header.host)) {
+				return req.header.host;
+			} else {
+				return 'ig.ft.com';
+			}
+		}
 	}))
+	.use(async (ctx, next) => {
+		const acao = ctx.response.get('Access-Control-Allow-Origin');
+		if (acao && acao !== '*') {
+			ctx.response.set('Vary', [ctx.response.get('Vary'), 'Origin'].filter(Boolean).join(', '));
+		}
+		await next();
+	})
 	.use(router.routes())
 	.use(router.allowedMethods())
 	.use(rootRouter.routes())
