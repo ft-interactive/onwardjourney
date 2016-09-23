@@ -61,7 +61,8 @@ async function limit(ctx, next) {
 
 async function render(ctx, next) {
 	await next();
-	ctx.set('Cache-Control', 'public, max-age=1200');
+	ctx.set('Cache-Control', 'public, maxage=1200');
+	ctx.set('Server', 'ig-onwardjourney');
 	if (ctx.params.format === 'html') {
 		if (ctx.list.items.length) {
 			ctx.render(ctx.params.layout || 'default', ctx.list);
@@ -114,7 +115,21 @@ if (!prod) {
 app
 	.use(koaCors({
 		methods: ['GET'],
+		origin: !prod ? true : req => {
+			if (/\.ft\.com(:\d+)?$/.test(req.header.host)) {
+				return req.header.host;
+			} else {
+				return 'ig.ft.com';
+			}
+		}
 	}))
+	.use(async (ctx, next) => {
+		const acao = ctx.response.get('Access-Control-Allow-Origin');
+		if (acao && acao !== '*') {
+			ctx.response.set('Vary', [ctx.response.get('Vary'), 'Origin'].filter(Boolean).join(', '));
+		}
+		await next();
+	})
 	.use(router.routes())
 	.use(router.allowedMethods())
 	.use(rootRouter.routes())
