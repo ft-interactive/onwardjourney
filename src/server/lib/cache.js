@@ -10,7 +10,8 @@ const lru = lruCache({
   maxAge,
   max: 200000, // 200K (ish)
   stale: true,
-  length: (n, key) => JSON.stringify(n).length + JSON.stringify(key).length,
+  length: (value, key) =>
+    JSON.stringify(value).length + JSON.stringify(key).length,
 });
 
 export default function cache(keyFn = noop, refresh = noop, max = maxAge) {
@@ -21,6 +22,11 @@ export default function cache(keyFn = noop, refresh = noop, max = maxAge) {
   //    return !bypassCache && 'my-key';
   // }
   if (!key) return refresh();
+
+  if (pending.has(key)) {
+   debug('already pending %s', key);
+   return pending.get(key);
+  }
 
   // grab the current value in case the key is
   // just about to be deleted so we can serve
@@ -56,11 +62,8 @@ export default function cache(keyFn = noop, refresh = noop, max = maxAge) {
   if (isCached) {
     debug('cache hit %s', key);
     return Promise.resolve(lru.get(key));
-  } else if (pending.has(key)) {
-    debug('already pending %s', key);
-    return pending.get(key);
   } else if (hasStaleValue) {
-    debug('return stale and schedule bg refresh %s', key);
+    debug('start BG refresh and return stale value %s', key);
     const p = Promise.resolve(stale);
     pending.set(key, p);
     process.nextTick(() => {
