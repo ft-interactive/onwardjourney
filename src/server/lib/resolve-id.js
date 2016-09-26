@@ -6,6 +6,7 @@ const vanities = {
 		world: 'MQ&#x3D;&#x3D;-U2VjdGlvbnM&#x3D;',
 		'chart-doctor': 'YTIwMWFhZGEtOGE4MS00ZDdlLTlhYjUtZjA4NmY0ZjcxNzhh-QnJhbmRz',
 		'the-big-read': 'MTE4-U2VjdGlvbnM&#x3D;',
+		'ft-data': 'MGY2ZTQ3MTYtYjJiNS00ODVhLTlkYTktNzZlNzc3YTcxOWYy-QnJhbmRz',
 	},
 
 	list: {
