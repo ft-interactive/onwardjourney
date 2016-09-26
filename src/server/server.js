@@ -13,7 +13,7 @@ import Router from 'koa-router';
 import list from './lib/load-list';
 import thing from './lib/load-thing';
 import resolveId from './lib/resolve-id';
-
+import cache from './lib/cache';
 
 const PORT = process.env.PORT || 5000;
 const prod = process.env.NODE_ENV === 'production';
@@ -25,7 +25,7 @@ process.on('uncaughtException', error => {
 });
 
 process.on('unhandledRejection', error => {
-	console.log('Global uncaughtException!', error.stack);
+	console.log('Global unhandledRejection!', error.stack);
 	console.dir(error);
 	process.exit(1);
 });
@@ -61,9 +61,9 @@ async function limit(ctx, next) {
 
 async function render(ctx, next) {
 	await next();
-	ctx.set('Cache-Control', 'public, max-age=1200');
+	ctx.set('Cache-Control', 'public, maxage=1200');
 	ctx.set('Server', 'ig-onwardjourney');
-	if (ctx.params.format === 'html') {
+		if (ctx.params.format === 'html') {
 		if (ctx.list.items.length) {
 			ctx.render(ctx.params.layout || 'default', ctx.list);
 		}
@@ -92,7 +92,10 @@ router
 	.get('/:path(thing|list)/:name/:format/:layout?', async (ctx, next) => {
 		const fn = ctx.params.path === 'list' ? list : thing;
 		const id = resolveId(ctx.params.path, ctx.params.name);
-		ctx.list = await fn(id);
+		ctx.list = await cache(
+			`res:${id}`,
+			() => fn(id)
+		);
 		await next();
 	})
 ;
