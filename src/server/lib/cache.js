@@ -3,7 +3,6 @@ import debugLogger from 'debug';
 
 const debug = debugLogger('cache');
 const pending = new Map();
-const noop = () => {};
 const maxAge = 60 * 1000 * 5; // 5 mins
 
 const lru = lruCache({
@@ -14,14 +13,14 @@ const lru = lruCache({
     JSON.stringify(value).length + JSON.stringify(key).length,
 });
 
-export default function cache(keyFn = noop, refresh = noop, max = maxAge) {
+export default function cache(keyFn, job, max = maxAge) {
   const key = typeof keyFn === 'string' ? keyFn : keyFn();
 
   // key can be falsey to bypass caching. e.g.
   // const keyFn = () => {
   //    return !bypassCache && 'my-key';
   // }
-  if (!key) return refresh();
+  if (!key) return job();
 
   if (pending.has(key)) {
    debug('already pending %s', key);
@@ -36,9 +35,9 @@ export default function cache(keyFn = noop, refresh = noop, max = maxAge) {
   const isCached = lru.has(key);
   const hasStaleValue = !!stale;
 
-  function doRefresh() {
+  function refresh() {
     debug('refreshing %s', key);
-    return refresh()
+    return job()
       .then(result => {
         debug('caching value %s', key);
         lru.set(key, result, max);
@@ -67,15 +66,14 @@ export default function cache(keyFn = noop, refresh = noop, max = maxAge) {
     const p = Promise.resolve(stale);
     pending.set(key, p);
     process.nextTick(() => {
-      doRefresh().catch(err => {
+      refresh().catch(err => {
         console.error('Failed background refresh', err.message);
       });
     });
     return p;
   }
 
-  const pendingPromise = doRefresh();
+  const pendingPromise = refresh();
   pending.set(key, pendingPromise);
   return pendingPromise;
-
 }
