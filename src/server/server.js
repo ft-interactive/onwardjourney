@@ -61,7 +61,7 @@ async function limit(ctx, next) {
 
 async function render(ctx, next) {
 	await next();
-	ctx.set('Cache-Control', 'public, max-age=1200');
+	ctx.set('Cache-Control', 'public, max-age=600, s-maxage=60');
 	ctx.set('Server', 'ig-onwardjourney');
 	if (ctx.params.format === 'html') {
 		if (ctx.list.items.length) {
