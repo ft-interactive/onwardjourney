@@ -8,7 +8,7 @@
     "develop": "trip develop",
     "develop:prod": "trip develop:prod",
     "postinstall": "bower install && npm run build",
-    "start": "node dist/server/server.js",
+    "start": "node --optimize_for_size --max_old_space_size=460 --gc_interval=100 dist/server/server.js",
     "test": "eslint . && npm run build"
   },
   "author": "Sumeet Adur",
