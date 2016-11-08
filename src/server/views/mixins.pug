@@ -45,7 +45,7 @@ mixin link(article)
       = article.title
 
 mixin image(image)
-  img(src=`https://image.webservices.ft.com/v1/images/raw/${image.url}?source=ig&width=390` alt="")
+  img(src=`https://www.ft.com/__origami/service/image/v2/images/raw/${image.url}?source=ig&width=390` alt="")
 
 mixin timestamp(date)
   time.o-card__timestamp.o-date(datetime=helpers.isotime(date))=helpers.ftdate(date)
