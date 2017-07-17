@@ -21,12 +21,10 @@
     "babel-runtime": "^6.23.0",
     "babelify": "^7.3.0",
     "bluebird": "^3.5.0",
-    "bower": "^1.8.0",
     "chalk": "^2.0.1",
     "cheerio": "^1.0.0-rc.2",
     "cssnano": "^3.10.0",
     "d3-time-format": "^2.0.5",
-    "debowerify": "^1.5.0",
     "debug": "^2.6.8",
     "del-cli": "^1.1.0",
     "dotenv": "^4.0.0",
@@ -71,7 +69,7 @@
     "build": "trip build",
     "develop": "trip develop",
     "develop:prod": "trip develop:prod",
-    "postinstall": "bower install && npm run build",
+    "postinstall": "npm run build",
     "start": "node --optimize_for_size --max_old_space_size=460 --gc_interval=100 dist/server/server.js",
     "test": "eslint . && npm run build"
   }
