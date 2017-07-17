@@ -20,7 +20,7 @@ export default function resolveId(type, vanityOrId) {
 		throw new Error('Unknown taxonomy type');
 	}
 
-	return !!vanities[type][vanityOrId]
-                                ? vanities[type][vanityOrId]
-                                : vanityOrId;
+	return vanities[type][vanityOrId] ?
+		vanities[type][vanityOrId] :
+		vanityOrId;
 }

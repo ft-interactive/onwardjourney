@@ -1,4 +1,4 @@
-import 'isomorphic-fetch';
+import fetch from 'node-fetch';
 import createError from 'http-errors';
 import api from '@financial-times/n-es-client';
 import list from '../models/list';
@@ -53,7 +53,7 @@ export default async function loadList(id) {
 
 		// workaround api client rejecting with a stackless error
 		// - see https://github.com/matthew-andrews/fetchres/issues/9
-		if ((!err instanceof Error) || !err.stack) {
+		if ((!(err instanceof Error)) || !err.stack) {
 			const nonErr = new Error(`
 				Non-error thrown
 					name: "${err.name}";

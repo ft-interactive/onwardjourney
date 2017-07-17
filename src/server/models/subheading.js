@@ -1,6 +1,6 @@
 import cheerio from 'cheerio';
 
-export default item => {
+export default (item) => {
 	if (item.summaries && item.summaries.length) {
 		return item.summaries[0];
 	}

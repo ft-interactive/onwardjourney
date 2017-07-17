@@ -4,5 +4,8 @@ const prepositions = {
 	authors: 'from',
 };
 
-export default (taxonomy, name) =>
-	(!prepositions[taxonomy] ? name : ['Latest', prepositions[taxonomy], name].join(' '));
+export default (taxonomy, name) => (
+	!prepositions[taxonomy] ?
+		name :
+		['Latest', prepositions[taxonomy], name].join(' ')
+);

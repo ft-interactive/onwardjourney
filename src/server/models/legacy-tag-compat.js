@@ -4,5 +4,6 @@ const streamUrl = (id, taxonomy) =>
 const createTag = ({ taxonomy, headshot, prefLabel, idV1 }) =>
 	({ id: idV1, taxonomy, headshot, name: prefLabel, url: streamUrl(idV1, taxonomy) });
 
-export default metadata =>
-	(metadata ? createTag(metadata) : undefined);
+export default metadata => (
+	metadata ? createTag(metadata) : undefined
+);
