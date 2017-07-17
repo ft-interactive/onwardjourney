@@ -1,4 +1,3 @@
-import 'isomorphic-fetch';
 import createError from 'http-errors';
 import api from '@financial-times/n-es-client';
 import list from '../models/list';
@@ -52,8 +51,8 @@ function getThings(opts) {
 	}
 
 	return Promise.all(
-		identifierValues.map(id => getTag(id, identifierType))
-	).then(results => {
+		identifierValues.map(id => getTag(id, identifierType)),
+	).then((results) => {
 		const items = results
 					.filter(r => r.status === 200)
 					.map(r => r.body.term);
@@ -98,10 +97,10 @@ export default function loadThing(id) {
 			canFollow: true,
 			url: 'https://next.ft.com/stream/' + tags.items[0].taxonomy + 'Id/' + id,
 		});
-	}).catch(err => {
+	}).catch((err) => {
 		// workaround api client rejecting with a stackless error
 		// - see https://github.com/matthew-andrews/fetchres/issues/9
-		if ((!err instanceof Error) || !err.stack) {
+		if ((!(err instanceof Error)) || !err.stack) {
 			if (err.name === 'BadServerResponseError') {
 				throw new createError.NotFound();
 			}

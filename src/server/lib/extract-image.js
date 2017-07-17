@@ -13,4 +13,6 @@ export default (item, defaultSize, className) => {
 		}
 		return item.mainImage;
 	}
+
+	return undefined;
 };

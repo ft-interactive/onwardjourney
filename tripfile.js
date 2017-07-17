@@ -4,10 +4,11 @@ import chalk from 'chalk';
 import cssnano from 'cssnano';
 import execa from 'execa';
 import path from 'path';
-import { directory, chain, plugin } from 'exhibit';
+import { chain, plugin } from 'exhibit';
+import Directory from 'exhibit-directory';
 
-const src = directory('src');
-const dist = directory('dist');
+const src = new Directory('src');
+const dist = new Directory('dist');
 
 const PORT = process.env.PORT || 5000;
 
@@ -25,7 +26,7 @@ const preprocess = chain(
 		root: 'src',
 		match: 'client/**/*.js',
 		transforms: ['debowerify'],
-	})
+	}),
 );
 
 const optimise = chain(
@@ -69,14 +70,14 @@ export async function develop({ prod }) {
 							'\nIf you like, run BrowserSync in another terminal:',
 							chalk.grey('\n  >'),
 							chalk.cyan(
-								`browser-sync start --proxy="localhost:${PORT}" --files="./dist/**" --open=1`
-							)
+								`browser-sync start --proxy="localhost:${PORT}" --files="./dist/**" --open=1`,
+							),
 						);
 					}, 2000);
 				}
 			}, 500);
 
-			return files => {
+			return (files) => {
 				restart();
 				return files;
 			};

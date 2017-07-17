@@ -3,6 +3,7 @@ parser: babel-eslint
 extends: airbnb/base
 rules:
   indent: [2, tab]
+  no-tabs: 0
   brace-style: [2, stroustrup, {allowSingleLine: false}]
   no-console: 0
   prefer-template: 0
