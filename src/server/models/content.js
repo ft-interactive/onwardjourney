@@ -11,6 +11,6 @@ export default content => ({
 	subheading: subheading(content),
 	mainImage: extractImage(content),
 	// metadata: item.metadata,//.map(legacyTagCompat),
-	branding: legacyTagCompat(getBranding(content.metadata)),
-	primaryTag: legacyTagCompat(getPrimaryTag(content.metadata)),
+	branding: content.metadata ? legacyTagCompat(getBranding(content.metadata)) : null,
+	primaryTag: content.metadata ? legacyTagCompat(getPrimaryTag(content.metadata)) : null,
 });
