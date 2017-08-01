@@ -23,23 +23,24 @@ function getTag(id, type) {
 	};
 	data.query.term[`metadata.${type}`] = id;
 	return api.search(data)
-	.then(([resultData]) => {
-		const { metadata } = resultData;
-		if (metadata) {
+		.then(([resultData]) => {
+			const { metadata } = resultData;
+			if (metadata) {
+				return {
+					status: 200,
+					body: compat(metadata.find(tag => tag[type] === id)),
+				};
+			}
 			return {
-				status: 200,
-				body: compat(metadata.find(tag => tag[type] === id)),
+				status: 404,
+				body: { error: 'Not found, could be deleted or might never had existed' },
 			};
-		}
-		return {
-			status: 404,
-			body: { error: 'Not found, could be deleted or might never had existed' },
-		};
-	})
-	.catch(() => ({
-		status: 500,
-		body: { error: 'Server error' },
-	}));
+		})
+		.catch(() => ({
+			status: 500,
+			body: { error: 'Server error' },
+		}))
+	;
 }
 
 function getThings(opts) {
