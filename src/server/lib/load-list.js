@@ -23,19 +23,20 @@ function getItems(opts) {
 	return api.mget({
 		ids: uuid,
 	})
-	.then((docs) => {
-		if (returnMany) {
-			return docs;
-		}
-		if (docs.length === 0) {
-			throw new createError.NotFound();
-		}
+		.then((docs) => {
+			if (returnMany) {
+				return docs;
+			}
+			if (docs.length === 0) {
+				throw new createError.NotFound();
+			}
 
-		return docs[0];
-	})
-	.catch(() => {
-		throw new createError.NotFound();
-	});
+			return docs[0];
+		})
+		.catch(() => {
+			throw new createError.NotFound();
+		})
+	;
 }
 
 /**
