@@ -53,18 +53,21 @@ function getThings(opts) {
 
 	return Promise.all(
 		identifierValues.map(id => getTag(id, identifierType)),
-	).then((results) => {
-		const items = results
-					.filter(r => r.status === 200)
-					.map(r => r.body.term);
-		return {
-			total: items.length,
-			items,
-		};
-	})
-	.catch(() => {
-		throw new createError.NotFound();
-	});
+	)
+		.then((results) => {
+			const items = results
+				.filter(r => r.status === 200)
+				.map(r => r.body.term);
+
+			return {
+				total: items.length,
+				items,
+			};
+		})
+		.catch(() => {
+			throw new createError.NotFound();
+		})
+	;
 }
 
 /**
