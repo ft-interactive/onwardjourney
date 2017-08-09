@@ -34,7 +34,7 @@ app.use(koaConditional());
 app.use(koaEtag());
 
 const router = new Router({
-	prefix: '/v1',
+	prefix: '/v2',
 });
 const rootRouter = new Router();
 
