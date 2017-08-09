@@ -53,7 +53,6 @@ function getThings(ids) {
 		identifierValues.map(id => getTag(id)),
 	)
 		.then((results) => {
-			console.dir(results);
 			const items = results
 				.filter(r => r.status === 200)
 				.map(r => r.body.term);
@@ -84,7 +83,6 @@ export default function loadThing(id) {
 		getThings([id]),
 
 	]).then(([searchResults, tags]) => {
-		console.dir(tags);
 		if (!tags.items || !tags.items.length) {
 			throw new createError.NotFound();
 		}
@@ -98,7 +96,6 @@ export default function loadThing(id) {
 			url: 'https://next.ft.com/stream/' + tags.items[0].taxonomy + 'Id/' + id,
 		});
 	}).catch((err) => {
-		console.dir(err);
 		// workaround api client rejecting with a stackless error
 		// - see https://github.com/matthew-andrews/fetchres/issues/9
 		if ((!(err instanceof Error)) || !err.stack) {
