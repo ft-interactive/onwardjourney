@@ -28,8 +28,6 @@
     "debug": "^2.6.8",
     "del-cli": "^1.1.0",
     "dotenv": "^4.0.0",
-    "eslint": "^4.3.0",
-    "eslint-config-airbnb": "^15.1.0",
     "eslint-plugin-babel": "^4.1.1",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
@@ -72,5 +70,9 @@
     "postinstall": "npm run build",
     "start": "node --optimize_for_size --max_old_space_size=460 --gc_interval=100 dist/server/server.js",
     "test": "eslint . && npm run build"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^15.1.0"
   }
 }

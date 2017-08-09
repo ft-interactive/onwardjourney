@@ -4,15 +4,15 @@ import list from '../models/list';
 
 function compat(tag) {
 	return {
-		term: Object.assign({}, { name: tag.prefLabel, id: tag.idV1 }, tag),
+		term: Object.assign({}, { name: tag.prefLabel, id: tag.id }, tag),
 	};
 }
 
-function getTag(id, type) {
+function getTag(id) {
 	const data = {
-		_source: ['metadata'],
+		_source: 'annotations',
 		query: {
-			term: {},
+			term: { 'annotations.id': id },
 		},
 		sort: {
 			publishedDate: {
@@ -21,14 +21,13 @@ function getTag(id, type) {
 		},
 		size: 1,
 	};
-	data.query.term[`metadata.${type}`] = id;
 	return api.search(data)
 		.then(([resultData]) => {
-			const { metadata } = resultData;
-			if (metadata) {
+			const { annotations } = resultData;
+			if (annotations) {
 				return {
 					status: 200,
-					body: compat(metadata.find(tag => tag[type] === id)),
+					body: compat(annotations.find(tag => tag.id === id)),
 				};
 			}
 			return {
@@ -43,16 +42,15 @@ function getTag(id, type) {
 	;
 }
 
-function getThings(opts) {
-	const identifierValues = opts.identifierValues;
-	const identifierType = opts.identifierType || 'idV1';
+function getThings(ids) {
+	const identifierValues = ids;
 
 	if (identifierValues.length === 0 || !Array.isArray(identifierValues)) {
 		return Promise.resolve([]);
 	}
 
 	return Promise.all(
-		identifierValues.map(id => getTag(id, identifierType)),
+		identifierValues.map(id => getTag(id)),
 	)
 		.then((results) => {
 			const items = results
@@ -78,15 +76,11 @@ export default function loadThing(id) {
 	return Promise.all([
 		api.search({
 			query: {
-				bool: {
-					filter: [
-						{ term: { 'metadata.idV1': id } },
-					],
-				},
+				term: { 'annotations.id': id },
 			},
 		}),
 
-		getThings({ identifierValues: [id] }),
+		getThings([id]),
 
 	]).then(([searchResults, tags]) => {
 		if (!tags.items || !tags.items.length) {
