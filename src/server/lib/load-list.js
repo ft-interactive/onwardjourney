@@ -8,7 +8,7 @@ function getList(opts) {
 	return fetch(`https://api.ft.com/lists/${uuid}?apiKey=${process.env.API_KEY}`) // Is there a better way of doing this?
 		.then(res => res.json())
 		.catch(() => {
-			throw new createError.NotFound();
+			throw new createError(404, ''); // Empty response to prevent "Not Found" text
 		});
 }
 
@@ -20,23 +20,23 @@ function getItems(opts) {
 		return Promise.resolve([]);
 	}
 
-	return api.mget({
-		ids: uuid,
-	})
+	return api
+		.mget({
+			ids: uuid,
+		})
 		.then((docs) => {
 			if (returnMany) {
 				return docs;
 			}
 			if (docs.length === 0) {
-				throw new createError.NotFound();
+				throw new createError(404, ''); // Empty response to prevent "Not Found" text
 			}
 
 			return docs[0];
 		})
 		.catch(() => {
-			throw new createError.NotFound();
-		})
-	;
+			throw new createError(404, ''); // Empty response to prevent "Not Found" text
+		});
 }
 
 /**
@@ -49,12 +49,12 @@ export default async function loadList(id) {
 	}
 	catch (err) {
 		if (err.name === 'BadServerResponseError') {
-			throw new createError.NotFound();
+			throw new createError(404, ''); // Empty response to prevent "Not Found" text
 		}
 
 		// workaround api client rejecting with a stackless error
 		// - see https://github.com/matthew-andrews/fetchres/issues/9
-		if ((!(err instanceof Error)) || !err.stack) {
+		if (!(err instanceof Error) || !err.stack) {
 			const nonErr = new Error(`
 				Non-error thrown
 					name: "${err.name}";
@@ -76,4 +76,4 @@ export default async function loadList(id) {
 		title: apiResult.title,
 		layoutHint: apiResult.layoutHint,
 	});
-};
+}
