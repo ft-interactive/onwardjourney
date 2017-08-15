@@ -156,6 +156,8 @@ app
 	})
 	.use(router.routes())
 	.use(router.allowedMethods())
+	.use(routerLegacy.routes())
+	.use(routerLegacy.allowedMethods())
 	.use(rootRouter.routes())
 	.use(koaStatic(path.resolve(__dirname, '..', 'client')))
 	.listen(PORT, () => {
