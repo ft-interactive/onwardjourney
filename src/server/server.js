@@ -10,6 +10,7 @@ import path from 'path';
 import Router from 'koa-router';
 import list from './lib/load-list';
 import thing from './lib/load-thing';
+import thingV1 from './lib/load-thing-v1';
 import resolveId from './lib/resolve-id';
 import cache from './lib/cache';
 
@@ -36,6 +37,11 @@ app.use(koaEtag());
 const router = new Router({
 	prefix: '/v2',
 });
+
+const routerLegacy = new Router({
+	prefix: '/v1',
+});
+
 const rootRouter = new Router();
 
 (new Pug({ // eslint-disable-line no-new
@@ -52,7 +58,7 @@ async function limit(ctx, next) {
 	await next();
 
 	if (ctx.limit && ctx.list && ctx.list.items
-																	&& ctx.list.items.length > ctx.limit) {
+		&& ctx.list.items.length > ctx.limit) {
 		ctx.list.items = ctx.list.items.slice(0, ctx.limit);
 	}
 }
@@ -97,6 +103,20 @@ router
 		await next();
 	})
 ;
+
+routerLegacy
+	.use(render)
+	.use(limit)
+	.get('/:path(thing|list)/:name/:format/:layout?', async (ctx, next) => {
+		const fn = ctx.params.path === 'list' ? list : thingV1;
+		const id = resolveId(ctx.params.path, ctx.params.name);
+		ctx.list = await cache(
+			`res:${id}`,
+			() => fn(id),
+		);
+		await next();
+	});
+
 
 rootRouter
 	.get('/favicon.ico', async (ctx) => {
