@@ -3,73 +3,13 @@ import createError from 'http-errors';
 import api from '@financial-times/n-es-client';
 import list from '../models/list';
 import { isV1Id } from '../helpers';
-
-function compat(tag) {
-	return {
-		term: Object.assign({}, { name: tag.prefLabel, id: tag.id }, tag),
-	};
-}
-
-function getTag(id) {
-	const data = {
-		_source: 'annotations',
-		query: {
-			term: { 'annotations.id': id },
-		},
-		sort: {
-			publishedDate: {
-				order: 'desc',
-			},
-		},
-		size: 1,
-	};
-	return api
-		.search(data)
-		.then(([resultData]) => {
-			const { annotations } = resultData;
-			if (annotations) {
-				return {
-					status: 200,
-					body: compat(annotations.find(tag => tag.id === id)),
-				};
-			}
-			return {
-				status: 404,
-				body: { error: 'Not found, could be deleted or might never had existed' },
-			};
-		})
-		.catch(() => ({
-			status: 500,
-			body: { error: 'Server error' },
-		}));
-}
-
-function getThings(ids) {
-	const identifierValues = ids;
-
-	if (identifierValues.length === 0 || !Array.isArray(identifierValues)) {
-		return Promise.resolve([]);
-	}
-
-	return Promise.all(identifierValues.map(id => getTag(id)))
-		.then((results) => {
-			const items = results.filter(r => r.status === 200).map(r => r.body.term);
-
-			return {
-				total: items.length,
-				items,
-			};
-		})
-		.catch(() => {
-			throw new createError.NotFound();
-		});
-}
+import { getThings } from './load-thing';
 
 /**
  * Downloads a list of articles from CAPI and returns
  * the UUIDs, plus any metadata.
  */
-export default async function loadThing(id) {
+export default async function loadThingV1(id) {
 	try {
 		if (isV1Id(id)) {
 			const endpoint = `http://api.ft.com/concordances?identifierValue=${id}=&authority=http://api.ft.com/system/FT-TME&apiKey=${process.env.CONTENT_API_KEY}`;
