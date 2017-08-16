@@ -88,7 +88,7 @@ export default function loadThing(id) {
 				items: searchResults,
 				title: tags.items[0].name,
 				canFollow: true,
-				url: 'https://next.ft.com/stream/' + tags.items[0].taxonomy + 'Id/' + id,
+				url: 'https://www.ft.com/stream/' + id,
 			});
 		})
 		.catch((err) => {
