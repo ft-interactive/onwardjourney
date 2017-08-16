@@ -42,7 +42,7 @@ function getTag(id) {
 		}));
 }
 
-function getThings(ids) {
+export function getThings(ids) {
 	const identifierValues = ids;
 
 	if (identifierValues.length === 0 || !Array.isArray(identifierValues)) {
