@@ -68,7 +68,7 @@ async function render(ctx, next) {
 	ctx.set('Cache-Control', 'public, max-age=600, s-maxage=60');
 	ctx.set('Server', 'ig-onwardjourney');
 	if (ctx.params.format === 'html') {
-		if (ctx.list.items.length) {
+		if (ctx.list && ctx.list.items && ctx.list.items.length) {
 			ctx.render(ctx.params.layout || 'default', ctx.list);
 		}
 		else {
