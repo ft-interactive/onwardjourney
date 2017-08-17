@@ -12,9 +12,16 @@ const { CONCORDANCE_API_KEY } = process.env;
  */
 export default async function loadThingV1(id) {
 	try {
-		const endpoint = `http://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${CONCORDANCE_API_KEY}`;
-		const { concordances } = (await (await fetch(endpoint)).json());
-		const idV2 = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
+		let idV2;
+		if (id.indexOf('=') > -1) {
+			const endpoint = `http://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${CONCORDANCE_API_KEY}`;
+			const { concordances } = (await (await fetch(endpoint)).json());
+			idV2 = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
+		}
+		else { // This is actually a v2 ID already
+			idV2 = id;
+		}
+
 
 		return Promise.all([
 			api.search({
