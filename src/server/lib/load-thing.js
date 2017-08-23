@@ -59,7 +59,7 @@ export function getThings(ids) {
 			};
 		})
 		.catch(() => {
-			throw new createError.NotFound();
+			throw new createError(404, '');
 		});
 }
 
