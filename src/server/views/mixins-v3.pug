@@ -1,12 +1,12 @@
 mixin card(article, contextId)
   -
-    var classes = ['o-teaser'];
+    var classes = ['o-teaser o-teaser--large'];
     var imageclasses = ['o-teaser__image-container']
     if (attributes.imagetype === 'right') {
       classes.push('o-teaser--small o-teaser--image-right');
       imageclasses.push('o-teaser__image--right');
     } else if (attributes.imagetype === 'top' || attributes.imagetype === 'bottom') {
-      classes.push('o-teaser--image');
+      classes.push('o-teaser--has-image');
     }
     if (article.branding) {
       classes.push('o-teaser--opinion')
@@ -45,10 +45,12 @@ mixin link(article)
       = article.title
 
 mixin image(image)
-  img(src=`https://www.ft.com/__origami/service/image/v2/images/raw/${image.url}?source=ig&width=390` alt="" class="o-teaser__image")
+  div.o-teaser__image-placeholder.image-placeholder
+    img(src=`https://www.ft.com/__origami/service/image/v2/images/raw/${image.url}?source=ig&width=390` alt="" class="o-teaser__image")
 
 mixin timestamp(date)
-  time.o-teaser__timestamp.o-date(datetime=helpers.isotime(date))=helpers.ftdate(date)
+  div.o-teaser__timestamp
+    time.o-date(datetime=helpers.isotime(date))=helpers.ftdate(date)
 
 mixin brandingtag(branding, showheadshot)
   if branding.headshot && showheadshot
@@ -74,7 +76,8 @@ mixin panel_header(title, url, label)
   -var heading = label || title;
   .onward-journey__header
     span.onward-journey__title
-      h3.onward-journey__name= heading
     if url
       a.onward-journey__link(href=url, data-trackable='link-topic-see-all')
-        span.header__link__text See all
+        h3.onward-journey__name= heading
+    else
+      h3.onward-journey__name= heading
