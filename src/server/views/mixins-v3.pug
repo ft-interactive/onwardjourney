@@ -1,0 +1,80 @@
+mixin card(article, contextId)
+  -
+    var classes = ['o-teaser'];
+    var imageclasses = ['o-teaser__image-container']
+    if (attributes.imagetype === 'right') {
+      classes.push('o-teaser--small o-teaser--image-right');
+      imageclasses.push('o-teaser__image--right');
+    } else if (attributes.imagetype === 'top' || attributes.imagetype === 'bottom') {
+      classes.push('o-teaser--image');
+    }
+    if (article.branding) {
+      classes.push('o-teaser--opinion')
+    }
+    var showMeta = article.branding || attributes.primarytopic;
+    var useImage = article.mainImage && attributes.imagetype;
+    var imageAbove = useImage && attributes.imagetype !== 'bottom';
+    var imageBelow = useImage && !imageAbove;
+    var showBranding = article.branding && article.branding.id !== contextId;
+    var showHeadshot = !useImage;
+    var showPrimaryTopic = article.primaryTag && article.primaryTag.id !== contextId;
+    var showTopic = !!article.primaryTag;
+  div(class=classes, data-o-component='o-teaser')
+    if imageAbove
+      div(class=imageclasses): +image(article.mainImage)
+    .o-teaser__content
+      .o-teaser__meta
+        if showBranding
+          +brandingtag(article.branding, showHeadshot)
+        else if article.primaryTag
+          +tag(article.primaryTag.url, article.primaryTag.name)
+      unless attributes.hideHeadline
+        +headline(article, attributes.smallText)
+      if attributes.showStandfirst
+        +standfirst(article.subheading, attributes.smallText)
+      unless attributes.hideTimestamp
+        +timestamp(article.publishedDate)
+    if imageBelow
+      div(class=imageclasses): +image(article.mainImage)
+
+mixin link(article)
+  a(href=`http://www.ft.com/cms/s/${ article.id }.html`)
+    if block
+      block
+    else
+      = article.title
+
+mixin image(image)
+  img(src=`https://www.ft.com/__origami/service/image/v2/images/raw/${image.url}?source=ig&width=390` alt="" class="o-teaser__image")
+
+mixin timestamp(date)
+  time.o-teaser__timestamp.o-date(datetime=helpers.isotime(date))=helpers.ftdate(date)
+
+mixin brandingtag(branding, showheadshot)
+  if branding.headshot && showheadshot
+    img.o-teaser__meta-image.o-teaser__meta-image--rounded(src=`${branding.headshot}?width=120&source=IG`)
+  a.o-teaser__tag(href=branding.url)=branding.name
+
+mixin tag(url, label)
+  a.o-teaser__tag(href=url)=label
+
+mixin headline(article, small)
+  - var classes = ['o-teaser__heading', small && 'o-teaser__heading--small']
+  h2(class=classes): +link(article)
+
+mixin standfirst(text, small)
+  - var classes = ['o-teaser__standfirst', small && 'o-teaser__standfirst--small']
+  p(class=classes)= text
+
+mixin col(rules)
+  div(data-o-grid-colspan=rules)
+    block
+
+mixin panel_header(title, url, label)
+  -var heading = label || title;
+  .onward-journey__header
+    span.onward-journey__title
+      h3.onward-journey__name= heading
+    if url
+      a.onward-journey__link(href=url, data-trackable='link-topic-see-all')
+        span.header__link__text See all

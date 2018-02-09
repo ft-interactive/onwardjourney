@@ -34,6 +34,10 @@ const app = new Koa();
 app.use(koaConditional());
 app.use(koaEtag());
 
+const routerV3 = new Router({
+	prefix: '/v3',
+});
+
 const router = new Router({
 	prefix: '/v2',
 });
@@ -89,6 +93,47 @@ async function render(ctx, next) {
 		}
 	}
 }
+
+async function renderV3(ctx, next) {
+	await next();
+	ctx.set('Cache-Control', 'public, max-age=600, s-maxage=60');
+	ctx.set('Server', 'ig-onwardjourney');
+	if (ctx.params.format === 'html') {
+		if (ctx.list && ctx.list.items && ctx.list.items.length) {
+			ctx.render(ctx.params.layout || 'default-v3', ctx.list);
+		}
+		else {
+			ctx.body = '';
+		}
+	}
+	else if (ctx.params.format === 'json') {
+		if (ctx.params.layout === 'ids') {
+			ctx.body = ctx.list.items.map(item => item.id);
+		}
+		else if (ctx.params.layout === 'simple') {
+			ctx.body = ctx.list.items.map(
+				item => ({ id: item.id, title: item.title, image: item.mainImage && item.mainImage.url }),
+			);
+		}
+		else {
+			ctx.body = ctx.list;
+		}
+	}
+}
+
+routerV3
+	.use(renderV3)
+	.use(limit)
+	.get('/:path(thing|list)/:name/:format/:layout?', async (ctx, next) => {
+		const fn = ctx.params.path === 'list' ? list : thing;
+		const id = resolveId(ctx.params.path, ctx.params.name);
+		ctx.list = await cache(
+			`res:${id}`,
+			() => fn(id),
+		);
+		await next();
+	})
+	;
 
 router
 	.use(render)
@@ -154,6 +199,8 @@ app
 		}
 		await next();
 	})
+	.use(routerV3.routes())
+	.use(routerV3.allowedMethods())
 	.use(router.routes())
 	.use(router.allowedMethods())
 	.use(routerLegacy.routes())
