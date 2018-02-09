@@ -182,7 +182,7 @@ app
 	.use(koaCors({
 		methods: ['GET'],
 		origin: !prod ? true : (req) => {
-			if (/\.ft\.com(:\d+)?$/.test(req.header.host)) {
+			if (/\.ft\.com(:\d+)?$/.test(req.header.host) || /localhost(:\d+)?$/.test(req.header.host)) {
 				return req.header.host;
 			}
 
