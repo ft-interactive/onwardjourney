@@ -180,7 +180,6 @@ if (!prod) {
 const domainWhitelist = {
 	'ft-ig-content-prod.s3-website-eu-west-1.amazonaws.com': true,
 	'ft-ig-content-dev.s3-website-eu-west-1.amazonaws.com': true,
-	localhost: true,
 };
 
 // start it up
@@ -188,7 +187,11 @@ app
 	.use(koaCors({
 		methods: ['GET'],
 		origin: !prod ? true : (req) => {
-			if (domainWhitelist.hasOwnProperty(req.header.host) || /\.ft\.com(:\d+)?$/.test(req.header.host)) {
+			if (
+				domainWhitelist.hasOwnProperty(req.header.host) ||
+				/\.ft\.com(:\d+)?$/.test(req.header.host) ||
+				/localhost(:\d+)?$/.test(req.header.host)
+			) {
 				return req.header.host;
 			}
 
