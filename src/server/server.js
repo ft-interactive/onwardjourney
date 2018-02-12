@@ -129,7 +129,7 @@ routerV3
 		const id = resolveId(ctx.params.path, ctx.params.name);
 		ctx.list = await cache(
 			`res:${id}`,
-			() => fn(id),
+			() => fn(id, 6), // v3 layout returns six stories vs. 8
 		);
 		await next();
 	})

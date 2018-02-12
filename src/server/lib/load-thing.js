@@ -67,7 +67,7 @@ export function getThings(ids) {
  * Downloads a list of articles from CAPI and returns
  * the UUIDs, plus any metadata.
  */
-export default function loadThing(id) {
+export default function loadThing(id, count = 8) {
 	return Promise.all([
 		api.search({
 			query: {
@@ -85,7 +85,7 @@ export default function loadThing(id) {
 			return list({
 				id,
 				type: tags.items[0].taxonomy,
-				items: searchResults,
+				items: searchResults.slice(0, count),
 				title: tags.items[0].name,
 				canFollow: true,
 				url: 'https://www.ft.com/stream/' + id,
