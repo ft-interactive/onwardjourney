@@ -42,7 +42,7 @@ function getItems(opts) {
 /**
  * Downloads a list of articles from CAPI and returns the UUIDs, plus any metadata.
  */
-export default async function loadList(id) {
+export default async function loadList(id, count = 8) {
 	let apiResult;
 	try {
 		apiResult = await getList({ uuid: id, retry: 6 });
@@ -72,7 +72,7 @@ export default async function loadList(id) {
 	return list({
 		id,
 		type: 'list',
-		items: await getItems({ uuid: uuids, index: 'v3_api_v2' }),
+		items: (await getItems({ uuid: uuids, index: 'v3_api_v2' })).slice(0, count),
 		title: apiResult.title,
 		layoutHint: apiResult.layoutHint,
 	});
