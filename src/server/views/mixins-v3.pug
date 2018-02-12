@@ -1,13 +1,7 @@
 mixin card(article, contextId)
   -
-    var classes = ['o-teaser o-teaser--large'];
+    var classes = ['o-teaser o-teaser--small o-teaser--stacked'];
     var imageclasses = ['o-teaser__image-container']
-    if (attributes.imagetype === 'right') {
-      classes.push('o-teaser--small o-teaser--image-right');
-      imageclasses.push('o-teaser__image--right');
-    } else if (attributes.imagetype === 'top' || attributes.imagetype === 'bottom') {
-      classes.push('o-teaser--has-image');
-    }
     if (article.branding) {
       classes.push('o-teaser--opinion')
     }
@@ -15,6 +9,9 @@ mixin card(article, contextId)
     var useImage = article.mainImage && attributes.imagetype;
     var imageAbove = useImage && attributes.imagetype !== 'bottom';
     var imageBelow = useImage && !imageAbove;
+    if (useImage) {
+      classes.push('o-teaser--has-image')
+    }
     var showBranding = article.branding && article.branding.id !== contextId;
     var showHeadshot = !useImage;
     var showPrimaryTopic = article.primaryTag && article.primaryTag.id !== contextId;
