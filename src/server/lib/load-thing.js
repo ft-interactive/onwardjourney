@@ -1,6 +1,9 @@
+import fetch from 'node-fetch';
 import createError from 'http-errors';
 import api from '@financial-times/n-es-client';
 import list from '../models/list';
+
+const { CONCORDANCE_API_KEY } = process.env;
 
 function compat(tag) {
 	return {
@@ -31,9 +34,10 @@ function getTag(id) {
 					body: compat(annotations.find(tag => tag.id === id)),
 				};
 			}
+
 			return {
 				status: 404,
-				body: { error: 'Not found, could be deleted or might never had existed' },
+				body: '',
 			};
 		})
 		.catch(() => ({
@@ -58,7 +62,8 @@ export function getThings(ids) {
 				items,
 			};
 		})
-		.catch(() => {
+		.catch((e) => {
+			console.error(e);
 			throw new createError(404, '');
 		});
 }
@@ -77,9 +82,41 @@ export default function loadThing(id) {
 
 		getThings([id]),
 	])
-		.then(([searchResults, tags]) => {
+		.then(async ([searchResults, tags]) => {
 			if (!tags.items || !tags.items.length) {
-				throw new createError(404, ''); // Empty response to prevent "Not Found" text
+				// This is likely a CAPI v2 identifier; we need to update it to CAPI v3
+				try {
+					const endpoint = `http://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/UPP&apiKey=${CONCORDANCE_API_KEY}`;
+					const { concordances } = (await (await fetch(endpoint)).json());
+					const v3ConceptId = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
+
+					const [searchResultsV3, tagsV3] = await Promise.all([
+						api.search({
+							query: {
+								term: { 'annotations.id': v3ConceptId },
+							},
+						}),
+						getThings([v3ConceptId]),
+					]);
+
+					if (!tagsV3.items || !tagsV3.items.length) { // (╯°□°）╯︵ ┻━┻
+						console.error(`No items for ${id}`);
+						throw new createError(404, ''); // Empty response to prevent "Not Found" text
+					}
+
+					return list({
+						id,
+						type: tagsV3.items[0].taxonomy,
+						items: searchResultsV3,
+						title: tagsV3.items[0].name,
+						canFollow: true,
+						url: 'https://www.ft.com/stream/' + id,
+					});
+				}
+				catch (e) { // Couldn't resolve an updated CAPI ID; return 404 instead.
+					console.error(e);
+					throw new createError(404, ''); // Empty response to prevent "Not Found" text
+				}
 			}
 
 			return list({
