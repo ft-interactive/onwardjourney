@@ -12,6 +12,7 @@ const vanities = {
 	list: {
 		graphics: '2f94fa02-647f-11e6-8e73-a628b7ca0fc8',
 		highlights: '73667f46-1a55-11e5-a130-2e7db721f996',
+		lawyers: '64641b86-2b85-11e8-9b4b-bc4b9f08f381',
 	},
 };
 
