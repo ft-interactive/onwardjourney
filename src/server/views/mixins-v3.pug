@@ -32,11 +32,11 @@ mixin card(article, contextId)
       unless attributes.hideTimestamp
         +timestamp(article.publishedDate)
     if imageBelow
-      +link(article)
+      +link(article, ariahide=true)
         div(class=imageclasses): +image(article.mainImage)
 
-mixin link(article)
-  a(href=`http://www.ft.com/cms/s/${ article.id }.html`)
+mixin link(article, ariahide=false)
+  a(href=`http://www.ft.com/cms/s/${ article.id }.html`, 'aria-hidden'=(ariahide ? 'true' : null), tabindex=(ariahide ? -1 : null))
     if block
       block
     else
