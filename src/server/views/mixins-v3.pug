@@ -32,7 +32,8 @@ mixin card(article, contextId)
       unless attributes.hideTimestamp
         +timestamp(article.publishedDate)
     if imageBelow
-      div(class=imageclasses): +image(article.mainImage)
+      +link(article)
+        div(class=imageclasses): +image(article.mainImage)
 
 mixin link(article)
   a(href=`http://www.ft.com/cms/s/${ article.id }.html`)
