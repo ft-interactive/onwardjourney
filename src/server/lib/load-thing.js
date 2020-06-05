@@ -86,7 +86,7 @@ export default function loadThing(id) {
 			if (!tags.items || !tags.items.length) {
 				// This is likely a CAPI v2 identifier; we need to update it to CAPI v3
 				try {
-					const endpoint = `http://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/UPP&apiKey=${CONCORDANCE_API_KEY}`;
+					const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/UPP&apiKey=${CONCORDANCE_API_KEY}`;
 					const { concordances } = (await (await fetch(endpoint)).json());
 					const v3ConceptId = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
 
