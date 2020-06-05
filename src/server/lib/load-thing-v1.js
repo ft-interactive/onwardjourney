@@ -14,7 +14,7 @@ export default async function loadThingV1(id) {
 	try {
 		let idV2;
 		if (id.indexOf('=') > -1) {
-			const endpoint = `http://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${CONCORDANCE_API_KEY}`;
+			const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${CONCORDANCE_API_KEY}`;
 			const { concordances } = (await (await fetch(endpoint)).json());
 			idV2 = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
 		}
