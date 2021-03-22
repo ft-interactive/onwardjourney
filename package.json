@@ -47,7 +47,7 @@
     "koa-cors": "^0.0.16",
     "koa-etag": "^3.0.0",
     "koa-logger": "^3.0.1",
-    "koa-pug": "^3.0.0-2",
+    "koa-pug": "^5.0.0",
     "koa-router": "^7.2.1",
     "koa-static": "^4.0.1",
     "lodash": "^4.17.15",
