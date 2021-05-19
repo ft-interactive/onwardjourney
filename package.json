@@ -59,8 +59,8 @@
     "trip": "^2.0.0"
   },
   "engines": {
-    "node": ">=8.1.4",
-    "npm": ">=5.3.0"
+    "node": ">=12",
+    "npm": ">=6"
   },
   "license": "MIT",
   "main": "index.js",
