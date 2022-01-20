@@ -23,8 +23,8 @@
     "ES_AWS_SECRET_ACCESS_KEY": {
       "description": "Secret access Key for ElasticSearch"
     },
-    "CONTENT_API_KEY": {
-      "description": "API key for Content API"
+    "CONCORDANCE_API_KEY": {
+      "description": "API key for Concordance API"
     }
   }
 }
