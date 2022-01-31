@@ -3,12 +3,25 @@ import createError from 'http-errors';
 import api from '@financial-times/n-es-client';
 import list from '../models/list';
 
+interface IListItem {
+	id: string;
+	title: string;
+}
+
+interface IListAPIResponse {
+	title: string;
+	items: IListItem[];
+	layoutHint?: null;
+}
 function getList(opts) {
 	const uuid = opts.uuid;
 	return fetch(`https://api.ft.com/lists/${uuid}?apiKey=${process.env.API_KEY}`) // Is there a better way of doing this?
-		.then(res => res.json())
+		.then(res => {
+			if (!res.ok) throw new Error(res.statusText);
+				return res.json() as Promise<IListAPIResponse>
+		})
 		.catch(() => {
-			throw new createError(404, ''); // Empty response to prevent "Not Found" text
+			throw createError(404, ''); // Empty response to prevent "Not Found" text
 		});
 }
 
@@ -29,13 +42,13 @@ function getItems(opts) {
 				return docs;
 			}
 			if (docs.length === 0) {
-				throw new createError(404, ''); // Empty response to prevent "Not Found" text
+				throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 			}
 
 			return docs[0];
 		})
 		.catch(() => {
-			throw new createError(404, ''); // Empty response to prevent "Not Found" text
+			throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 		});
 }
 
@@ -43,13 +56,21 @@ function getItems(opts) {
  * Downloads a list of articles from CAPI and returns the UUIDs, plus any metadata.
  */
 export default async function loadList(id) {
-	let apiResult;
 	try {
-		apiResult = await getList({ uuid: id, retry: 6 });
+		const apiResult = await getList({ uuid: id, retry: 6 });
+		const uuids = apiResult.items.map(item => item.id.split('/').pop());
+
+		return list({
+			id,
+			type: 'list',
+			items: await getItems({ uuid: uuids, index: 'v3_api_v2' }),
+			title: apiResult.title,
+			layoutHint: apiResult.layoutHint,
+		});
 	}
-	catch (err) {
+	catch (err: any) {
 		if (err.name === 'BadServerResponseError') {
-			throw new createError(404, ''); // Empty response to prevent "Not Found" text
+			throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 		}
 
 		// workaround api client rejecting with a stackless error
@@ -60,20 +81,10 @@ export default async function loadList(id) {
 					name: "${err.name}";
 					message: "${err.message}"}
 			`);
-			nonErr.originalError = err;
+			// nonErr.originalError = err;
 			throw nonErr;
 		}
 
 		throw err;
 	}
-
-	const uuids = apiResult.items.map(item => item.id.split('/').pop());
-
-	return list({
-		id,
-		type: 'list',
-		items: await getItems({ uuid: uuids, index: 'v3_api_v2' }),
-		title: apiResult.title,
-		layoutHint: apiResult.layoutHint,
-	});
 }

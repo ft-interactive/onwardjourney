@@ -50,7 +50,7 @@ export function getThings(ids) {
 	const identifierValues = ids;
 
 	if (identifierValues.length === 0 || !Array.isArray(identifierValues)) {
-		return Promise.resolve([]);
+		throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 	}
 
 	return Promise.all(identifierValues.map(id => getTag(id)))
@@ -64,7 +64,7 @@ export function getThings(ids) {
 		})
 		.catch((e) => {
 			console.error(e);
-			throw new createError(404, '');
+			throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 		});
 }
 
@@ -83,11 +83,11 @@ export default function loadThing(id) {
 		getThings([id]),
 	])
 		.then(async ([searchResults, tags]) => {
-			if (!tags.items || !tags.items.length) {
+			if (!tags.items) {
 				// This is likely a CAPI v2 identifier; we need to update it to CAPI v3
 				try {
 					const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/UPP&apiKey=${CONCORDANCE_API_KEY}`;
-					const { concordances } = (await (await fetch(endpoint)).json());
+					const { concordances } = (await (await fetch(endpoint)).json() as {concordances: any[]});
 					const v3ConceptId = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
 
 					const [searchResultsV3, tagsV3] = await Promise.all([
@@ -101,7 +101,7 @@ export default function loadThing(id) {
 
 					if (!tagsV3.items || !tagsV3.items.length) { // (╯°□°）╯︵ ┻━┻
 						console.error(`No items for ${id}`);
-						throw new createError(404, ''); // Empty response to prevent "Not Found" text
+						throw new createError.NotFound('');
 					}
 
 					return list({
@@ -115,7 +115,7 @@ export default function loadThing(id) {
 				}
 				catch (e) { // Couldn't resolve an updated CAPI ID; return 404 instead.
 					console.error(e);
-					throw new createError(404, ''); // Empty response to prevent "Not Found" text
+					throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 				}
 			}
 
@@ -133,7 +133,7 @@ export default function loadThing(id) {
 			// - see https://github.com/matthew-andrews/fetchres/issues/9
 			if (!(err instanceof Error) || !err.stack) {
 				if (err.name === 'BadServerResponseError') {
-					throw new createError(404, ''); // Empty response to prevent "Not Found" text
+					throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 				}
 
 				const nonError = new Error(`
@@ -141,7 +141,7 @@ export default function loadThing(id) {
 					name: "${err.name}";
 					message: "${err.message}"}
 			`);
-				nonError.originalError = err;
+				// nonError.originalError = err;
 				throw nonError;
 			}
 			throw err;

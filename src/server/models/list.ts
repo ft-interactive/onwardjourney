@@ -7,7 +7,7 @@ const excludedThings = [
 
 	// Alphaville
 	'ZDkyYTVhMzYtYjAyOS00OWI1LWI5ZTgtM2QyYTIzYjk4Y2Jj-QnJhbmRz',
-].reduce((o, t) => o.set(t), new Map());
+].reduce((o, t) => o.set(t, true), new Map());
 
 const hasExcludedBrand = ({ branding }) =>
 	!branding || !excludedThings.has(branding.id);
@@ -15,13 +15,23 @@ const hasExcludedBrand = ({ branding }) =>
 const hasMainImage = ({ mainImage }) =>
 	!!mainImage && !!mainImage.url;
 
+interface IListItem {
+	id: string;
+	type: string;
+	items: any[];
+	title: string;
+	canFollow?: boolean;
+	layoutHint?: null | undefined;
+	url?: null | string;
+}
+
 export default ({
 	id, type, items,
 	title = '',
 	canFollow = false,
 	layoutHint = null,
 	url = null,
-}) => ({
+}: IListItem) => ({
 	id,
 	type,
 	title,
