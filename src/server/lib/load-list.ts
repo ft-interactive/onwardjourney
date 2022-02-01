@@ -21,7 +21,7 @@ function getList(opts) {
 				return res.json() as Promise<IListAPIResponse>
 		})
 		.catch(() => {
-			throw createError(404, ''); // Empty response to prevent "Not Found" text
+			throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 		});
 }
 

@@ -3,7 +3,6 @@ import Pug from 'koa-pug';
 import Koa, {Context, Next} from 'koa';
 import koaCors from 'koa-cors';
 import koaLogger from 'koa-logger';
-import koaStatic from 'koa-static';
 import koaConditional from 'koa-conditional-get';
 import koaEtag from 'koa-etag';
 import path from 'path';
@@ -99,7 +98,7 @@ async function renderV3(ctx: Context, next: Next) {
 	ctx.set('Server', 'ig-onwardjourney');
 	if (ctx.params.format === 'html') {
 		if (ctx.state.list && ctx.state.list.items && ctx.state.list.items.length) {
-			ctx.render(ctx.params.layout || 'default-v3', ctx.state.list);
+			await ctx.render(ctx.params.layout || 'default-v3', ctx.state.list);
 		}
 		else {
 			ctx.body = '';
@@ -130,6 +129,7 @@ routerV3
 			`res:${id}`,
 			() => fn(id),
 		);
+
 		await next();
 	})
 	;
@@ -218,7 +218,6 @@ app
 	.use(routerLegacy.routes())
 	.use(routerLegacy.allowedMethods())
 	.use(rootRouter.routes())
-	.use(koaStatic(path.resolve(__dirname, '..', 'client')))
 	.listen(PORT, () => {
 		console.log(`Running on port ${PORT} - http://localhost:${PORT}/`);
 	})

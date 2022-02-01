@@ -35,15 +35,8 @@ function getTag(id) {
 				};
 			}
 
-			return {
-				status: 404,
-				body: '',
-			};
-		})
-		.catch(() => ({
-			status: 500,
-			body: { error: 'Server error' },
-		}));
+			throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
+		});
 }
 
 export function getThings(ids) {
