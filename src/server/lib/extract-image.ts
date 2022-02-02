@@ -1,4 +1,4 @@
-export default (item, defaultSize, className) => {
+export default (item, defaultSize?, className?) => {
 	if (item.mainImage) {
 		if (defaultSize) {
 			item.mainImage.srcset = {

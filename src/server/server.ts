@@ -1,9 +1,8 @@
 import 'dotenv/config';
 import Pug from 'koa-pug';
-import Koa from 'koa';
+import Koa, {Context, Next} from 'koa';
 import koaCors from 'koa-cors';
 import koaLogger from 'koa-logger';
-import koaStatic from 'koa-static';
 import koaConditional from 'koa-conditional-get';
 import koaEtag from 'koa-etag';
 import path from 'path';
@@ -24,8 +23,7 @@ process.on('uncaughtException', (error) => {
 });
 
 process.on('unhandledRejection', (error) => {
-	console.log('Global unhandledRejection!', error.stack);
-	console.dir(error);
+	console.log('Global unhandledRejection!', error);
 	process.exit(1);
 });
 
@@ -51,29 +49,29 @@ const rootRouter = new Router();
 (new Pug({ // eslint-disable-line no-new
 	app,
 	viewPath: path.resolve(__dirname, 'views'),
-	helperPath: path.resolve(__dirname, 'helpers.js'),
+	helperPath: [path.resolve(__dirname, 'helpers.ts')],
 }));
 
-async function limit(ctx, next) {
-	if (Number.isInteger(Number.parseInt(ctx.query.limit, 10))) {
-		ctx.limit = Number.parseInt(ctx.query.limit, 10);
+async function limit(ctx: Context, next: Next) {
+	if (Number.isInteger(Number.parseInt(<string>ctx.query.limit, 10))) {
+		ctx.limit = Number.parseInt(<string>ctx.query.limit, 10);
 	}
 
 	await next();
 
-	if (ctx.limit && ctx.list && ctx.list.items
-		&& ctx.list.items.length > ctx.limit) {
-		ctx.list.items = ctx.list.items.slice(0, ctx.limit);
+	if (ctx.limit && ctx.state.list && ctx.state.list.items
+		&& ctx.state.list.items.length > ctx.limit) {
+		ctx.state.list.items = ctx.state.list.items.slice(0, ctx.limit);
 	}
 }
 
-async function render(ctx, next) {
+async function render(ctx: Context, next: Next) {
 	await next();
 	ctx.set('Cache-Control', 'public, max-age=600, s-maxage=60');
 	ctx.set('Server', 'ig-onwardjourney');
 	if (ctx.params.format === 'html') {
-		if (ctx.list && ctx.list.items && ctx.list.items.length) {
-			ctx.render(ctx.params.layout || 'default', ctx.list);
+		if (ctx.state.list && ctx.state.list.items && ctx.state.list.items.length) {
+			ctx.render(ctx.params.layout || 'default', ctx.state.list);
 		}
 		else {
 			ctx.body = '';
@@ -81,26 +79,26 @@ async function render(ctx, next) {
 	}
 	else if (ctx.params.format === 'json') {
 		if (ctx.params.layout === 'ids') {
-			ctx.body = ctx.list.items.map(item => item.id);
+			ctx.body = ctx.state.list.items.map((item: IElasticSearchItem) => item.id);
 		}
 		else if (ctx.params.layout === 'simple') {
-			ctx.body = ctx.list.items.map(
-				item => ({ id: item.id, title: item.title, image: item.mainImage && item.mainImage.url }),
+			ctx.body = ctx.state.list.items.map(
+				(item: IElasticSearchItem) => ({ id: item.id, title: item.title, image: item.mainImage && item.mainImage.url }),
 			);
 		}
 		else {
-			ctx.body = ctx.list;
+			ctx.body = ctx.state.list;
 		}
 	}
 }
 
-async function renderV3(ctx, next) {
+async function renderV3(ctx: Context, next: Next) {
 	await next();
 	ctx.set('Cache-Control', 'public, max-age=600, s-maxage=60');
 	ctx.set('Server', 'ig-onwardjourney');
 	if (ctx.params.format === 'html') {
-		if (ctx.list && ctx.list.items && ctx.list.items.length) {
-			ctx.render(ctx.params.layout || 'default-v3', ctx.list);
+		if (ctx.state.list && ctx.state.list.items && ctx.state.list.items.length) {
+			await ctx.render(ctx.params.layout || 'default-v3', ctx.state.list);
 		}
 		else {
 			ctx.body = '';
@@ -108,15 +106,15 @@ async function renderV3(ctx, next) {
 	}
 	else if (ctx.params.format === 'json') {
 		if (ctx.params.layout === 'ids') {
-			ctx.body = ctx.list.items.map(item => item.id);
+			ctx.body = ctx.state.list.items.map((item: IElasticSearchItem) => item.id);
 		}
 		else if (ctx.params.layout === 'simple') {
-			ctx.body = ctx.list.items.map(
-				item => ({ id: item.id, title: item.title, image: item.mainImage && item.mainImage.url }),
+			ctx.body = ctx.state.list.items.map(
+				(item: IElasticSearchItem) => ({ id: item.id, title: item.title, image: item.mainImage && item.mainImage.url }),
 			);
 		}
 		else {
-			ctx.body = ctx.list;
+			ctx.body = ctx.state.list;
 		}
 	}
 }
@@ -127,10 +125,11 @@ routerV3
 	.get('/:path(thing|list)/:name/:format/:layout?', async (ctx, next) => {
 		const fn = ctx.params.path === 'list' ? list : thing;
 		const id = resolveId(ctx.params.path, ctx.params.name);
-		ctx.list = await cache(
+		ctx.state.list = await cache(
 			`res:${id}`,
 			() => fn(id),
 		);
+
 		await next();
 	})
 	;
@@ -141,7 +140,7 @@ router
 	.get('/:path(thing|list)/:name/:format/:layout?', async (ctx, next) => {
 		const fn = ctx.params.path === 'list' ? list : thing;
 		const id = resolveId(ctx.params.path, ctx.params.name);
-		ctx.list = await cache(
+		ctx.state.list = await cache(
 			`res:${id}`,
 			() => fn(id),
 		);
@@ -155,7 +154,7 @@ routerLegacy
 	.get('/:path(thing|list)/:name/:format/:layout?', async (ctx, next) => {
 		const fn = ctx.params.path === 'list' ? list : thingV1;
 		const id = resolveId(ctx.params.path, ctx.params.name);
-		ctx.list = await cache(
+		ctx.state.list = await cache(
 			`res:${id}`,
 			() => fn(id),
 		);
@@ -188,6 +187,9 @@ app
 		methods: ['GET'],
 		origin: !prod ? true : (req) => {
 			const { origin } = req.headers;
+
+			if (!origin) return 'ig.ft.com';
+
 			if (
 				Object.prototype.hasOwnProperty.call(domainWhitelist, origin) ||
 				/\.ft\.com(:\d+)?$/.test(origin) ||
@@ -216,8 +218,16 @@ app
 	.use(routerLegacy.routes())
 	.use(routerLegacy.allowedMethods())
 	.use(rootRouter.routes())
-	.use(koaStatic(path.resolve(__dirname, '..', 'client')))
 	.listen(PORT, () => {
 		console.log(`Running on port ${PORT} - http://localhost:${PORT}/`);
 	})
 ;
+
+
+interface IElasticSearchItem {
+	id: string;
+	title: string;
+	mainImage: {
+		url: string
+	}
+}

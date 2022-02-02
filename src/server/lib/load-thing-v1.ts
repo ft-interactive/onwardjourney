@@ -6,6 +6,16 @@ import { getThings } from './load-thing';
 
 const { CONCORDANCE_API_KEY } = process.env;
 
+interface IThingAPIConcordance{
+	concept: {
+		id: string;
+	}
+}
+
+interface IThingAPIV1Result {
+	concordances: IThingAPIConcordance[]
+}
+
 /**
  * Downloads a list of articles from CAPI and returns
  * the UUIDs, plus any metadata.
@@ -15,7 +25,7 @@ export default async function loadThingV1(id) {
 		let idV2;
 		if (id.indexOf('=') > -1) {
 			const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${CONCORDANCE_API_KEY}`;
-			const { concordances } = (await (await fetch(endpoint)).json());
+			const { concordances } = (await (await fetch(endpoint)).json() as IThingAPIV1Result);
 			idV2 = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
 		}
 		else { // This is actually a v2 ID already
@@ -34,7 +44,7 @@ export default async function loadThingV1(id) {
 		])
 			.then(([searchResults, tags]) => {
 				if (!tags.items || !tags.items.length) {
-					throw new createError(404, ''); // Empty response to prevent "Not Found" text
+					throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 				}
 
 				return list({
@@ -51,7 +61,7 @@ export default async function loadThingV1(id) {
 				// - see https://github.com/matthew-andrews/fetchres/issues/9
 				if (!(err instanceof Error) || !err.stack) {
 					if (err.name === 'BadServerResponseError') {
-						throw new createError(404, ''); // Empty response to prevent "Not Found" text
+						throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 					}
 
 					const nonError = new Error(`
@@ -59,7 +69,7 @@ export default async function loadThingV1(id) {
 						name: "${err.name}";
 						message: "${err.message}"}
 				`);
-					nonError.originalError = err;
+					// nonError.originalError = err;
 					throw nonError;
 				}
 				throw err;
