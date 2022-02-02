@@ -15,10 +15,10 @@ Both routes have the following query parameters:
 
 You need an `.env` file with the variables listed in [app.json](./app.json)
 
-Start a watch server:
+Then run:
 
 ```
-npm run develop
+npm start
 ```
 
 ## Licence
