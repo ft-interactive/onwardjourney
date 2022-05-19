@@ -4,7 +4,7 @@ import api from '@financial-times/n-es-client';
 import list from '../models/list';
 import { getThings } from './load-thing';
 
-const { CONCORDANCE_API_KEY } = process.env;
+const { API_KEY } = process.env;
 
 interface IThingAPIConcordance{
 	concept: {
@@ -24,7 +24,7 @@ export default async function loadThingV1(id) {
 	try {
 		let idV2;
 		if (id.indexOf('=') > -1) {
-			const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${CONCORDANCE_API_KEY}`;
+			const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${API_KEY}`;
 			const { concordances } = (await (await fetch(endpoint)).json() as IThingAPIV1Result);
 			idV2 = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
 		}
