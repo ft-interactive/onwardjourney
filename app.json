@@ -7,6 +7,15 @@
     "NODE_ENV": "production",
     "API_KEY": {
       "description": "API Key for FT API"
+    },
+    "ES_AWS_ACCESS_KEY": {
+      "description": "API Key for FT API"
+    },
+    "ES_AWS_SECRET_ACCESS_KEY": {
+      "description": "API Key for FT API"
+    },
+    "ES_INTERFACE_API_KEY": {
+      "description": "API Key for FT API"
     }
   }
 }
