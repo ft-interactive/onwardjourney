@@ -3,7 +3,7 @@ import createError from 'http-errors';
 import api from '@financial-times/n-es-client';
 import list from '../models/list';
 
-const { CONCORDANCE_API_KEY } = process.env;
+const { API_KEY } = process.env;
 
 function compat(tag) {
 	return {
@@ -79,7 +79,7 @@ export default function loadThing(id) {
 			if (!tags.items) {
 				// This is likely a CAPI v2 identifier; we need to update it to CAPI v3
 				try {
-					const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/UPP&apiKey=${CONCORDANCE_API_KEY}`;
+					const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/UPP&apiKey=${API_KEY}`;
 					const { concordances } = (await (await fetch(endpoint)).json() as {concordances: any[]});
 					const v3ConceptId = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
 
