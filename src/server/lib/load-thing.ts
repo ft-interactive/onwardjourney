@@ -26,7 +26,9 @@ function getTag(id) {
 	};
 	return api
 		.search(data)
-		.then(([resultData]) => {
+		.then((results) => {
+			console.log(results)
+			const [resultData] = results;
 			const { annotations } = resultData;
 			if (annotations) {
 				return {
