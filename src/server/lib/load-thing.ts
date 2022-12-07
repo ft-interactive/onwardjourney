@@ -27,10 +27,9 @@ function getTag(id) {
 	return api
 		.search(data)
 		.then((results) => {
-			console.log(results)
-			const [resultData] = results;
-			const { annotations } = resultData;
-			if (annotations) {
+			if (results.total > 0) {
+				const [resultData] = results;
+				const { annotations } = resultData;
 				return {
 					status: 200,
 					body: compat(annotations.find(tag => tag.id === id)),
