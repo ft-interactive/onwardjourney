@@ -35,7 +35,7 @@ function getTag(id) {
 					body: compat(annotations.find(tag => tag.id === id)),
 				};
 			}
-
+			console.info(`Not found: thing ${id}`);
 			throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
 		});
 }
