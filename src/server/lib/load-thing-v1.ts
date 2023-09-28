@@ -26,6 +26,12 @@ export default async function loadThingV1(id) {
 		if (id.indexOf('=') > -1) {
 			const endpoint = `https://api.ft.com/concordances?identifierValue=${id}&authority=http://api.ft.com/system/FT-TME&apiKey=${API_KEY}`;
 			const { concordances } = (await (await fetch(endpoint)).json() as IThingAPIV1Result);
+
+			if (!concordances) {
+				console.error(`concordance not found: ${id}`);
+				throw new createError.NotFound(''); // Empty response to prevent "Not Found" text
+			}
+
 			idV2 = concordances[0].concept.id.replace(/https?:\/\/api\.ft\.com\/\w+\//, '');
 		}
 		else { // This is actually a v2 ID already
@@ -76,7 +82,6 @@ export default async function loadThingV1(id) {
 			});
 	}
 	catch (e) {
-		console.error(e);
 		throw e;
 	}
 }
