@@ -19,12 +19,12 @@ const prod = process.env.NODE_ENV === 'production';
 process.on('uncaughtException', (error) => {
 	console.log('Global uncaughtException!', error.stack);
 	console.dir(error);
-	process.exit(1);
+	// process.exit(1);
 });
 
 process.on('unhandledRejection', (error) => {
 	console.log('Global unhandledRejection!', error);
-	process.exit(1);
+	// process.exit(1);
 });
 
 const app = new Koa();
