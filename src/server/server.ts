@@ -29,6 +29,17 @@ process.on('unhandledRejection', (error) => {
 
 const app = new Koa();
 
+// Global error handler
+app.use(async (ctx, next) => {
+	try {
+	  await next();
+	} catch (err) {
+	  console.error(err);
+	  ctx.status = 500;
+	  ctx.body = "";
+	}
+});
+
 app.use(koaConditional());
 app.use(koaEtag());
 
